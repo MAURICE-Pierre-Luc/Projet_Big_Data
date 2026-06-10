@@ -323,3 +323,16 @@ to_lowercase <- function(df, column) {
   return(df)
 }
 
+colonnes_avec_vides <- function(df) {
+  
+  nb_colonnes_vides <- 0
+  
+  for (col in names(df)) {
+    
+    if (any(is.na(df[[col]])) || any(trimws(df[[col]]) == "")) {
+      nb_colonnes_vides <- nb_colonnes_vides + 1
+    }
+  }
+  
+  return(nb_colonnes_vides)
+}

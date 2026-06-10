@@ -8,6 +8,9 @@ source("./Pierre-Luc_MAURICE/F_Traitement.R")
 df <- read.csv(file = "./Pierre-Luc_MAURICE/IRVE.csv", encoding="UTF-8")
 
 
+# Exemple d'utilisation
+colonnes_avec_vides(df)
+
 #On regarde le % de remplissage de chaque colone
 #taux <- (1 - colMeans(is.na(df))) * 100
 #df_taux <- data.frame(
