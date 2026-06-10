@@ -3,7 +3,7 @@ library(dplyr)
 library(leaflet)
 library(leaflet.extras)
 
-data_propre <- read_csv(file="./IRVE_clean.csv")
+data_propre <- read_csv(file = "./IRVE_clean.csv")
 
 carte_cluster <- leaflet(data_propre) %>%
   addTiles() %>%
