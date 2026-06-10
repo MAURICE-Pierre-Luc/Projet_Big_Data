@@ -7,9 +7,9 @@ df_clean <- read.csv(file = "IRVE_clean.csv", encoding="UTF-8")
 
 df_clean <- mutate(df_clean,tarification = as.numeric(gsub("€/kWh|€/kwh", "", tarification)))
 
-for(name in names(df_clean)){
-    nb_val_unique(df_clean, name,FALSE)
-}
+#for(name in names(df_clean)){
+#    nb_val_unique(df_clean, name,FALSE)
+#}
 
 
 # Calcul des pourcentages
@@ -108,7 +108,7 @@ for (i in 1:n) {
 }
 
 matrix_graph(cramer_matrix, "matrice_cramer_number", TRUE, TRUE, "number")
-matrix_graph(cramer_matrix, "matrice_cramer_number", TRUE, TRUE, "color")
+matrix_graph(cramer_matrix, "matrice_cramer_color", TRUE, TRUE, "color")
 
 paires_fortes <- which(cramer_matrix > 0.3, arr.ind = TRUE)
 
