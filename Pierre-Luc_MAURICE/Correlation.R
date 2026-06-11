@@ -191,7 +191,7 @@ predictions_test <- predict(modele_logit, df_test)
 cat("Taux de bonne classification :",
     round(mean(predictions_test == df_test$tarification_eur_kWh_groupe, na.rm = TRUE) * 100, 2), "%\n")
 
-  png(paste0("./Pierre-Luc_MAURICE/matrice_regression_tarification_eur_kWh.png"), width = 1200, height = 1000)
+  png(paste0("./Pierre-Luc_MAURICE/matrice_regression_tarification.png"), width = 1200, height = 1000)
 # La matrice de confusion des classifications sur les donnés de test
 as.data.frame(table(Prédit = predictions_test, Réel = df_test$tarification_eur_kWh_groupe)) %>%
   group_by(Réel) %>%
@@ -228,27 +228,20 @@ df_reg_puissance <- df_clean %>%
 # Séparation train/test (80/20)
 set.seed(42) # On fixe le 'aspect aleatoire pour pouvoir reproduire les résultats
 
-#On gardde seulement 80% des donnés pour entrainer le modèle
-idx_train <- sample(nrow(df_reg_puissance), 0.8 * nrow(df_reg_puissance))
-
-#On sépare les données dans leurs data frame respectifs
-df_train_p <- df_reg_puissance[idx_train, ]
-df_test_p  <- df_reg_puissance[-idx_train, ]
-
 # La fonction nm cheche à minimiser la somme des carrés  des erreurs entre les valeurs  réelles et prédites
 modele_lm <- lm(puissance_nominale ~ prise_type_combo_ccs + prise_type_2 +
                   paiement_acte + reservation + condition_acces + paiement_autre,
-                data = df_train_p)
+                data = df_reg_puissance)
 
 summary(modele_lm)
 
 # On fait une prédiction par le modèle sur les donnés de test, les 20 autres % qu'on a aps pris pour l'entrainement
-predictions_lm <- predict(modele_lm, df_test_p)
+predictions_lm <- fitted(modele_lm)
 
 
 # Performance du modèle
-rmse <- sqrt(mean((predictions_lm - df_test_p$puissance_nominale)^2, na.rm = TRUE))
-r2   <- cor(predictions_lm, df_test_p$puissance_nominale, use = "complete.obs")^2
+rmse <- sqrt(mean(residuals(modele_lm)^2))
+r2   <- summary(modele_lm)$r.squared
 cat("RMSE :", round(rmse, 2), "kW\n") # Erreure moyenne du modèle, il se trompe en moyenne de X kW
 cat("R²   :", round(r2, 4), "\n") # De combien on réduit l'erreur totale par rapport à un modèle qui donnerais uniquement la moyenne
 
