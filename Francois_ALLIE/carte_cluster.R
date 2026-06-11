@@ -3,9 +3,9 @@ library(dplyr)
 library(leaflet)
 library(leaflet.extras)
 
-data_propre <- read_csv(file = "./IRVE_clean.csv")
+data <- read_csv("./IRVE_clean.csv")
 
-carte_cluster <- leaflet(data_propre) %>%
+carte_cluster <- leaflet(data) %>%
   addTiles() %>%
   
   # Ajout des marqueurs avec l'option  pour le clustering
