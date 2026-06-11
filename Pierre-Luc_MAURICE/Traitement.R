@@ -8,7 +8,7 @@ source("./Pierre-Luc_MAURICE/F_Traitement.R")
 df <- read.csv(file = "./Pierre-Luc_MAURICE/IRVE.csv", encoding="UTF-8")
 
 
-# Exemple d'utilisation
+# Nous renvoie le nombre de colonnes ayant au moins un élément de vide
 colonnes_avec_vides(df)
 
 #On regarde le % de remplissage de chaque colone
@@ -82,6 +82,8 @@ df_dedup$tarification <- sapply(df_dedup$tarification, normalize_tarif)
 #On retire les tarifs vides
 df_dedup <- df_dedup[!is.na(df_dedup$tarification), ]
 
+df_dedup <- df_dedup %>%
+  rename( "tarification_eur_kWh" = "tarification")
 
 #Vérifie pour combien de lignes le id_station_itinerance et id_pdc_itinerance sont identique, inutile actuellement
 #sum(df_dedup$id_pdc_itinerance == df_dedup$id_station_itinerance, na.rm = TRUE)
@@ -138,3 +140,4 @@ cat("Lignes restantes :", nlignes_apres, "\n")
 
 #Export en csv, on encode bien en UTF-8
 write.csv(df_dedup, "IRVE_clean.csv", row.names=FALSE, fileEncoding = "UTF-8")
+

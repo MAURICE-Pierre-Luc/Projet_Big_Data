@@ -213,10 +213,10 @@ normalize_tarif <- function(x) {
   )
 
   # Conversion directe en format standard gratuit
-  if (x %in% gratuit_exact) return("0€/kwh")
+  if (x %in% gratuit_exact) return("0")
 
   # Détection gratuit
-  for (p in gratuit_patterns) if (grepl(p, x, perl = TRUE)) return("0€/kwh")
+  for (p in gratuit_patterns) if (grepl(p, x, perl = TRUE)) return("0")
 
   # Corrections d'encodage (€ mal encodé)
   x <- gsub("â‚¬", "€", x, fixed = TRUE)  # bug UTF-8 -> €
@@ -288,10 +288,10 @@ normalize_tarif <- function(x) {
   moyenne <- round(mean(valeurs), 4)
 
   # Cas particulier gratuit
-  if (moyenne == 0) return("0€/kwh")
+  if (moyenne == 0) return("0")
 
   # Retour final formaté
-  return(paste0(moyenne, "€/kWh"))
+  return(moyenne)
 }
 
 to_uppercase <- function(df, column) {
