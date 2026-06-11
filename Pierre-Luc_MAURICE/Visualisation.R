@@ -1,10 +1,10 @@
 
 
-source("F_Visualisation.R")
+source("./Pierre-Luc_MAURICE/F_Visualisation.R")
 
 .vsc.attach() #Pour pouvoir voir les variables sous vs code
 
-df <- read.csv(file = "IRVE.csv", encoding="UTF-8")
+df <- read.csv(file = "IRVE_clean.csv", encoding="UTF-8")
 
 
 df_clean <- read.csv(file = "IRVE_clean.csv", encoding="UTF-8")
@@ -34,6 +34,10 @@ df_plot <- pct_operateurs %>%
   arrange(desc(pct)) %>%
   mutate(label = factor(label, levels = label))
 
+png(paste0("./Pierre-Luc_MAURICE/parts_marche.png"),
+        width = 1200,
+        height = 1000)
+
 ggplot(df_plot, aes(x = "", y = n, fill = label)) +
     geom_bar(stat = "identity", width = 1) +
     coord_polar(theta = "y") +
@@ -47,7 +51,7 @@ ggplot(df_plot, aes(x = "", y = n, fill = label)) +
     ) +
     guides(fill = guide_legend(nrow =3 , byrow = FALSE))
 
-
+dev.off()
 
 val <- nb_val_unique(df_clean, "tarification", FALSE)
 hist(df_clean$tarification, breaks = c(0, 0.2, 0.4, 0.6, 0.8, 3))
