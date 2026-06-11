@@ -5,7 +5,7 @@ source("./Pierre-Luc_MAURICE/F_Correlation.R")
 
 df_clean <- read.csv(file = "IRVE_clean.csv", encoding="UTF-8")
 
-df_clean <- mutate(df_clean,tarification = as.numeric(gsub("€/kWh|€/kwh", "", tarification)))
+#df_clean <- mutate(df_clean,tarification_eur_kWh = as.numeric(gsub("€/kWh|€/kwh", "", tarification_eur_kWh)))
 
 #for(name in names(df_clean)){
 #    nb_val_unique(df_clean, name,FALSE)
@@ -45,13 +45,13 @@ df_matrix <- select( #select() sert à choisir seulement certaines colonnes dans
     restriction_gabarit  = as.factor(restriction_gabarit),
     raccordement         = as.factor(raccordement),
 
-    tarification       = cut(tarification, breaks = 5, include.lowest = TRUE),
+    tarification_eur_kWh      = cut(tarification_eur_kWh, breaks = 5, include.lowest = TRUE),
     puissance_nominale = cut(puissance_nominale, breaks = 5, include.lowest = TRUE),
     nbre_pdc = cut(nbre_pdc, breaks = c(0, 2, 5, 10, 44), labels = c("1-2", "3-5", "6-10", "11+"), include.lowest = TRUE)
   ),
 
   #L'ensemble des colonnes qu'on veut garder
-  nom_operateur, nbre_pdc, puissance_nominale, tarification,
+  nom_operateur, nbre_pdc, puissance_nominale, tarification_eur_kWh,
   prise_type_ef, prise_type_2, prise_type_combo_ccs, prise_type_chademo, prise_type_autre,
   gratuit, paiement_acte, paiement_cb, paiement_autre,
   implantation_station, condition_acces, accessibilite_pmr,
@@ -137,20 +137,20 @@ data.frame(
 
 
 
-#Regression logistique sur la tarification
+#Regression logistique sur la tarification_eur_kWh
 
 # On sépare les prix en 3 catégories
 df_clean <- df_clean %>%
-  mutate(tarification_groupe = case_when(
-    tarification == 0    ~ "bas",
-    tarification <= 0.4  ~ "modere",
-    tarification > 0.4   ~ "eleve",
+  mutate(tarification_eur_kWh_groupe = case_when(
+    tarification_eur_kWh == 0    ~ "bas",
+    tarification_eur_kWh <= 0.4  ~ "modere",
+    tarification_eur_kWh > 0.4   ~ "eleve",
     TRUE                 ~ NA_character_
   ) %>% factor(levels = c("bas", "modere", "eleve")))
 
 # On transforme les données pour pouvoir les exploiter
 df_reg <- df_clean %>%
-  filter(!is.na(tarification_groupe)) %>%
+  filter(!is.na(tarification_eur_kWh_groupe)) %>%
   mutate(
     nom_operateur = ifelse( # On ne garde que les operateurs qui composent 1% ou plus du marche pour éviter d'avoir trop de valeurs
       nom_operateur %in% (pct_operateurs %>% filter(pct >= 1) %>% pull(nom_operateur)),
@@ -173,12 +173,12 @@ idx_train <- sample(nrow(df_reg), 0.8 * nrow(df_reg)) #On prend 80% des donnés 
 df_train  <- df_reg[idx_train, ]
 df_test   <- df_reg[-idx_train, ]
 
-# Régression logistique multinomiale : prédit la classe de tarification (bas/modere/eleve)
+# Régression logistique multinomiale : prédit la classe de tarification_eur_kWh (bas/modere/eleve)
 # en fonction des variables explicatives sélectionnées via la matrice de Cramér.
 # multinom() estime 2 équations (standard vs gratuit) et (élevé vs gratuit),
 # "gratuit" étant la classe de référence.
 # maxit = 500 : nombre maximum d'itérations pour la convergence du modèle.
-modele_logit <- multinom(tarification_groupe ~ nom_operateur + paiement_autre +
+modele_logit <- multinom(tarification_eur_kWh_groupe ~ nom_operateur + paiement_autre +
                            accessibilite_pmr + restriction_gabarit +
                            reservation + paiement_acte,
                          data = df_train,
@@ -189,11 +189,11 @@ predictions_test <- predict(modele_logit, df_test)
 
 # On calcule le taux de bonne classification
 cat("Taux de bonne classification :",
-    round(mean(predictions_test == df_test$tarification_groupe, na.rm = TRUE) * 100, 2), "%\n")
+    round(mean(predictions_test == df_test$tarification_eur_kWh_groupe, na.rm = TRUE) * 100, 2), "%\n")
 
-  png(paste0("./Pierre-Luc_MAURICE/matrice_regression_tarification.png"), width = 1200, height = 1000)
+  png(paste0("./Pierre-Luc_MAURICE/matrice_regression_tarification_eur_kWh.png"), width = 1200, height = 1000)
 # La matrice de confusion des classifications sur les donnés de test
-as.data.frame(table(Prédit = predictions_test, Réel = df_test$tarification_groupe)) %>%
+as.data.frame(table(Prédit = predictions_test, Réel = df_test$tarification_eur_kWh_groupe)) %>%
   group_by(Réel) %>%
   mutate(pct = Freq / sum(Freq) * 100) %>%
   ggplot(aes(x = Réel, y = Prédit, fill = pct)) +
