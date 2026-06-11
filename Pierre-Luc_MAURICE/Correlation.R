@@ -132,6 +132,11 @@ data.frame(
 
 
 
+
+
+
+
+
 #Regression logistique sur la tarification
 
 # On sépare les prix en 3 catégories
@@ -184,8 +189,7 @@ predictions_test <- predict(modele_logit, df_test)
 
 # On calcule le taux de bonne classification
 cat("Taux de bonne classification :",
-    round(mean(predictions_test[idx_valides] == df_test$tarification_groupe[idx_valides]) * 100, 2), "%\n")
-
+    round(mean(predictions_test == df_test$tarification_groupe, na.rm = TRUE) * 100, 2), "%\n")
 
   png(paste0("./Pierre-Luc_MAURICE/matrice_regression_tarification.png"), width = 1200, height = 1000)
 # La matrice de confusion des classifications sur les donnés de test
@@ -200,6 +204,12 @@ as.data.frame(table(Prédit = predictions_test, Réel = df_test$tarification_gro
   labs(title = "Matrice de confusion - données test (20%)") +
   theme_minimal()
   dev.off()
+
+
+
+
+
+
 
 #Regression sur la puissance
 

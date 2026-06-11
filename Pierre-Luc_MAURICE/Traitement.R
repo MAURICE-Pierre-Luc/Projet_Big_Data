@@ -89,6 +89,9 @@ df_dedup <- df_dedup[!is.na(df_dedup$tarification), ]
 # On fait un traitement sur la colone horaire pour normaliser la syntaxe
 df_dedup$horaires <- sapply(df_dedup$horaires, normaliser_horaires)
 
+#On noramlise la sytaxe de la colone gabarit
+df_dedup$restriction_gabarit <- sapply(df_dedup$restriction_gabarit, normaliser_gabarit)
+
 #On normalise la syntaxe des colonnes ayant True et False en valeurs
 df_dedup <- normaliser_booleen(df_dedup,"prise_type_ef")
 df_dedup <- normaliser_booleen(df_dedup,"prise_type_2")
@@ -105,15 +108,12 @@ df_dedup <- normaliser_booleen(df_dedup,"consolidated_is_code_insee_verified")
 df_dedup <- normaliser_booleen(df_dedup,"consolidated_is_code_insee_modified")
 df_dedup <- normaliser_booleen(df_dedup,"cable_t2_attache")
 
-#On noramlise la sytaxe de la colone gabarit
-df_dedup$restriction_gabarit <- sapply(df_dedup$restriction_gabarit, normaliser_gabarit)
-
 #On met tout en uppercase pour pour eviter les doublons a cause de la case
 df_dedup <- to_uppercase(df_dedup, "nom_operateur")
 df_dedup <- to_uppercase(df_dedup, "nom_amenageur")
 df_dedup <- to_uppercase(df_dedup, "nom_enseigne")
 df_dedup <- to_lowercase(df_dedup, "nom_station")
-df_dedup <- to_lowercase(df_dedup, "addresse_station")
+df_dedup <- to_lowercase(df_dedup, "adresse_station")
 
 
 
