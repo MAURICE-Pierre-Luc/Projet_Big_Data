@@ -45,7 +45,6 @@ df_dedup <- supprimer_lignes_vides(df_dedup, "coordonneesXY")
 df_dedup <- supprimer_lignes_vides(df_dedup, "nbre_pdc")
 df_dedup <- supprimer_lignes_vides(df_dedup, "id_pdc_itinerance")
 df_dedup <- supprimer_lignes_vides(df_dedup, "puissance_nominale")
-df_dedup <- supprimer_lignes_valeur(df_dedup, "puissance_nominale", 0)
 df_dedup <- supprimer_lignes_vides(df_dedup, "prise_type_ef")
 df_dedup <- supprimer_lignes_vides(df_dedup, "prise_type_2")
 df_dedup <- supprimer_lignes_vides(df_dedup, "prise_type_combo_ccs")
@@ -60,9 +59,10 @@ df_dedup <- supprimer_lignes_vides(df_dedup, "restriction_gabarit")
 df_dedup <- supprimer_lignes_vides(df_dedup, "station_deux_roues")
 df_dedup <- supprimer_lignes_vides(df_dedup, "date_maj")
 
+#On supprime les lignes où la puissance nominale vaut 0, car on ne peut pas exploiter ces données
+df_dedup <- supprimer_lignes_valeur(df_dedup, "puissance_nominale", 0)
 
-
-#On normalise la colonne gratuit, comme on doit faire un comparaison avec ses éléments
+#On normalise la colonne gratuit, parce que on doit faire un comparaison avec ses éléments
 df_dedup <- normaliser_booleen(df_dedup,"gratuit")
 
 #Si on a pas de prix et que dans la colonne gratuit on a TRUE, alors on met le prix à 0€/kwh
@@ -73,8 +73,13 @@ df_dedup$tarification <- ifelse(
   df_dedup$tarification
 )
 
+#On supprime les lignes vide dans tarification, donnés non exploitables
 df_dedup <- supprimer_lignes_vides(df_dedup, "tarification")
+
+#On normalise le tarif et si besoin on fait une moyenne des tarfis présents dans la ligne
 df_dedup$tarification <- sapply(df_dedup$tarification, normalize_tarif)
+
+#On retire les tarifs vides
 df_dedup <- df_dedup[!is.na(df_dedup$tarification), ]
 
 
@@ -103,6 +108,7 @@ df_dedup <- normaliser_booleen(df_dedup,"cable_t2_attache")
 #On noramlise la sytaxe de la colone gabarit
 df_dedup$restriction_gabarit <- sapply(df_dedup$restriction_gabarit, normaliser_gabarit)
 
+#On met tout en uppercase pour pour eviter les doublons a cause de la case
 df_dedup <- to_uppercase(df_dedup, "nom_operateur")
 df_dedup <- to_uppercase(df_dedup, "nom_amenageur")
 df_dedup <- to_uppercase(df_dedup, "nom_enseigne")
@@ -110,6 +116,8 @@ df_dedup <- to_lowercase(df_dedup, "nom_station")
 df_dedup <- to_lowercase(df_dedup, "addresse_station")
 
 
+
+#On parcours toutes les colonnes, et on met inconnu si l'élément est vide pour éviter d'avoir des NA qui peuvent casser la visualisation des donnés
 for (j in seq_along(df_dedup)) {
 
   col <- as.character(df_dedup[[j]])
@@ -121,7 +129,7 @@ for (j in seq_along(df_dedup)) {
   df_dedup[[j]] <- col
 }
 
-
+#Nombre de lignes restantes après le traitement
 nlignes_apres <- nrow(df_dedup)
 
 
