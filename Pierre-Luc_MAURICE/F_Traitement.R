@@ -146,11 +146,27 @@ supprimer_lignes_valeur <- function(df, colonne, valeur) {
     return(df)
 }
 
-nb_val_unique <- function(df, colonne, list){
-    cat("Valeurs uniques",colonne,":", length(unique(df[[colonne]])), "\n")
-    if(list){
-        sort((unique(df[[colonne]]))) |> head(10)
-    }
+nb_val_unique <- function(df, colonne, show_list = FALSE) {
+
+  values <- df[[colonne]]
+  tab <- table(values)
+
+  cat("Colonne :", colonne, "\n")
+  cat("Nombre de valeurs uniques :", length(tab), "\n\n")
+
+  cat("Occurrences :\n")
+  print(tab)
+
+  if (show_list) {
+    cat("\nValeurs uniques (triées) :\n")
+    print(sort(unique(values)))
+  }
+
+  return(list(
+    n_unique = length(tab),
+    occurrences = tab,
+    uniques = sort(unique(values))
+  ))
 }
 
 convert_cts <- function(x, unit) {
