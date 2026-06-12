@@ -5,8 +5,8 @@ library(leaflet.extras)
 
 data <- read_csv("./IRVE_clean.csv")
 
-carte_cluster <- leaflet(data) %>%
-  addTiles() %>%
+carte_cluster <- leaflet(data) %>%  # L'opérateur "%>%" de R provient de la librairie dplyr et permet simplement de passer le résultat à sa gauche comme argument de la fonction à sa droite
+  addTiles() %>%                    # Ce qui permet de gagner des lignes 
   
   # Ajout des marqueurs avec l'option  pour le clustering
   addMarkers(
