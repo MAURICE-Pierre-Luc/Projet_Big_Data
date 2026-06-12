@@ -161,6 +161,7 @@ nlignes_apres <- nrow(df_dedup)
 cat("Lignes supprimées :", nlignes_avant - nlignes_apres, "\n")
 cat("Lignes restantes :", nlignes_apres, "\n")
 
+
 #Export en csv, on encode bien en UTF-8
 write.csv(df_dedup, "IRVE_clean.csv", row.names=FALSE, fileEncoding = "UTF-8")
 

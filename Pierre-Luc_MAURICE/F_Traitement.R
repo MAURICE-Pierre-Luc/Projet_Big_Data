@@ -3,6 +3,7 @@ library(janitor)
 library(lubridate)
 library(naniar)
 library(stringi)
+library(dplyr)
 
 normaliser_booleen <- function(df, colonne) {
     valeur <- tolower(trimws(df[[colonne]]))
