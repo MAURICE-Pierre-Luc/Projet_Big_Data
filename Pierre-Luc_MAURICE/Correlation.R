@@ -191,7 +191,8 @@ predictions_test <- predict(modele_logit, df_test)
 cat("Taux de bonne classification :",
     round(mean(predictions_test == df_test$tarification_eur_kWh_groupe, na.rm = TRUE) * 100, 2), "%\n")
 
-  png(paste0("./Pierre-Luc_MAURICE/matrice_regression_tarification.png"), width = 1200, height = 1000)
+
+png(paste0("./Pierre-Luc_MAURICE/matrice_regression_tarification.png"), width = 600, height = 500)
 # La matrice de confusion des classifications sur les donnés de test
 as.data.frame(table(Prédit = predictions_test, Réel = df_test$tarification_eur_kWh_groupe)) %>%
   group_by(Réel) %>%
@@ -200,11 +201,14 @@ as.data.frame(table(Prédit = predictions_test, Réel = df_test$tarification_eur
   geom_tile() +
   geom_text(aes(label = paste0(Freq, "\n(", round(pct, 1), "%)")),
             size = 4, color = "white", fontface = "bold") +
-  scale_fill_viridis_c() +
+  scale_fill_gradientn(colors = c("#3B8BD4", "#40c496", "#E85D24")) +  # ← palette custom
   labs(title = "Matrice de confusion - données test (20%)") +
-  theme_minimal()
-  dev.off()
+  theme_minimal() +
+  theme(
+    plot.margin = margin(t = 10, r = 160, b = 10, l = 160)  # ← réduit la matrice
+  )
 
+dev.off()
 
 
 
@@ -264,8 +268,8 @@ dev.off()
 png(paste0("./Pierre-Luc_MAURICE/graphe_regression_puissance_reel_vs_valeurs_predites.png"), width = 1200, height = 1000)
 # Réel vs prédit
 data.frame(
-  reel   = df_test_p$puissance_nominale,
-  predit = predict(modele_lm, df_test_p)
+  reel   = df_reg_puissance$puissance_nominale,
+  predit = predict(modele_lm, df_reg_puissance)
 ) %>%
   ggplot(aes(x = reel, y = predit)) +
   geom_point(alpha = 0.3) +

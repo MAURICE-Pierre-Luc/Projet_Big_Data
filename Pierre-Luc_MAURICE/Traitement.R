@@ -88,6 +88,29 @@ df_dedup <- df_dedup %>%
 #Vérifie pour combien de lignes le id_station_itinerance et id_pdc_itinerance sont identique, inutile actuellement
 #sum(df_dedup$id_pdc_itinerance == df_dedup$id_station_itinerance, na.rm = TRUE)
 
+
+#on retire les valeurs abérrantes de la colonne puissance nominale
+df_dedup <- df_dedup %>%
+  filter(puissance_nominale >= 0 & puissance_nominale <= 500)
+
+#On retire les dates avant 2017 et après 2026
+df_dedup <- df_dedup %>%
+  mutate(
+    date_mise_en_service = case_when(
+      is.na(date_mise_en_service) | date_mise_en_service == "" ~ "inconnu",
+      TRUE ~ as.character(date_mise_en_service)
+    ),
+    annee = suppressWarnings(as.numeric(substr(date_mise_en_service, 1, 4))) #On crée une colonne temporaire pour pouvoir traiter l'année plus facilement
+  ) %>%
+  filter(
+    date_mise_en_service == "inconnu" |
+    (!is.na(annee) & annee >= 2017 & annee <= 2026)
+  ) %>%
+  select(-annee)  # on supprime la colonne temporaire
+
+
+
+
 # On fait un traitement sur la colone horaire pour normaliser la syntaxe
 df_dedup$horaires <- sapply(df_dedup$horaires, normaliser_horaires)
 

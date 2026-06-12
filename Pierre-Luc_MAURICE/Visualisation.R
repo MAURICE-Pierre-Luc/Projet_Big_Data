@@ -11,16 +11,23 @@ df_clean <- read.csv(file = "IRVE_clean.csv", encoding="UTF-8")
 
 
 val <- nb_val_unique(df_clean, "nom_operateur", FALSE)
-val <- nb_val_unique(df_clean, "tarification", FALSE)
+val <- nb_val_unique(df_clean, "tarification_eur_kWh", FALSE)
 val <- nb_val_unique(df_clean, "puissance_nominale", FALSE)
 
-df_clean <- df_clean %>%
-  mutate(tarification = as.numeric(gsub("€/kWh|€/kwh", "", tarification)))
 
 # Calcul des pourcentages
+
+#Si on veut garder les opérateurs inconnus
 pct_operateurs <- df_clean %>%
   count(nom_operateur) %>%
   mutate(pct = n / sum(n) * 100)
+
+#Si on ne veut pas garder les opérateurs inconnus
+pct_operateurs <- df_clean %>%
+  filter(!is.na(nom_operateur), nom_operateur != "INCONNU", nom_operateur != "") %>%
+  count(nom_operateur) %>%
+  mutate(pct = n / sum(n) * 100)
+
 
 # Préparation pour le graphique
 df_plot <- pct_operateurs %>%
@@ -42,14 +49,14 @@ ggplot(df_plot, aes(x = "", y = n, fill = label)) +
     geom_bar(stat = "identity", width = 1) +
     coord_polar(theta = "y") +
     theme_void() +
-    #scale_fill_brewer(palette = "Set3") +
     scale_fill_viridis_d(direction = -1) +
     labs(title = "Répartition des opérateurs", fill = "") +
     theme(
         legend.position = "bottom",
-        legend.text = element_text(size = 9)
+        legend.text = element_text(size = 15),  # ← taille police augmentée
+        plot.margin = margin(t = 10, r = 100, b = 10, l = 100)  # ← marges latérales pour réduire le camembert
     ) +
-    guides(fill = guide_legend(nrow =3 , byrow = FALSE))
+    guides(fill = guide_legend(nrow = 3, byrow = FALSE))
 
 dev.off()
 
